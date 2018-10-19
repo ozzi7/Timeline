@@ -1,0 +1,6 @@
+How is the Block Reward Determined?
+Satoshi Nakamoto, Bitcoin’s creator, set the block reward schedule when he created Bitcoin. It is one of Bitcoin’s central rules and cannot be changed without agreement between the entire Bitcoin network.
+
+The block reward started at 50 BTC in block #1 and halves every 210,000 blocks. This means every block up until block #210,000 rewards 50 BTC, while block 210,001 rewards 25. Since blocks are mined on average every 10 minutes, 144 blocks are mined per day on average. At 144 blocks per day, 210,000 blocks take on average four years to mine.
+
+Total circulation will be 21,000,000 coins. It’ll be distributed to network nodes when they make blocks, with the amount cut in half every 4 years. first 4 years: 10,500,000 coins next 4 years: 5,250,000 coins next 4 years: 2,625,000 coins next 4 years: 1,312,500 coins etc… - Satoshi Nakamoto

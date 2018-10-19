@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Timeline of your Future, Old Man</title>
+  
+  <style>
+    body, html {
+      font-family: arial, sans-serif;
+      font-size: 9pt;
+	  color: rgb(155, 155, 155);
+	  background-color: rgb(26, 26, 26);
+    }
+    .vis-timeline {
+      border: 1px solid rgb(61,61,61);
+      font-family:  arial, sans-serif;
+      font-size: 10pt;
+      background: rgb(48, 48, 48);
+    }
+
+    .vis-item,
+    .vis-item.vis-line {
+      border-width: 3px;
+    }
+
+    .vis-item.vis-dot {
+      border-width: 10px;
+      border-radius: 10px;
+    }
+
+    .vis-item.vis-selected {
+      border-color: green;
+      background-color: lightgreen;
+    }
+	
+    .vis-time-axis .vis-text {
+	  color: rgb(155, 155, 155);
+      padding-top: 10px;
+      padding-left: 10px;
+    }
+	
+    .vis-time-axis .vis-text.vis-major {
+      font-weight: bold;
+	  color: rgb(155, 155, 155);
+    }
+	
+    .vis-time-axis .vis-text.vis-minor {
+	  color: rgb(130, 130, 130);
+    }
+	
+    .vis-time-axis .vis-grid.vis-minor {
+      border-width: 2px;
+      border-color: pink;
+    }
+
+    .vis-time-axis .vis-grid.vis-major {
+      border-width: 2px;
+      border-color: #FFFFFF;
+    }
+	.vis-label {
+		  display: flex;
+	  justify-content: center;
+      flex-direction: column;
+	  }
+	.vis-label .vis-inner{
+	  font-size: 11pt;
+	  color: rgb(155, 155, 155);
+    }
+	
+	.vis-label.draggable {
+	  display: flex;
+	  align-items: center;
+    }
+	
+	.vis-item.crypto  {
+		background-color: rgb(183, 191, 226); 
+	}
+	.vis-item.crypto.unconfirmed  {
+		background-color: rgb(165, 165, 165); 
+	}
+	.vis-item.top500  {
+		background-color: rgb(188, 240, 206);
+	}
+    .vis-item {
+	  border-color: #FFFFFF !important;
+      background-color: black;
+      font-size: 11pt;
+      color: rgb(48, 48, 48);
+ //   box-shadow: 1px 1px 1px rgba(128,128,128, 0.5);
+	  font-weight: bold;
+	  border-width: 1px;
+    }	
+    #visualization {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+    }
+    img {
+    float: left;
+}
+  </style>
+  <script src="vis/vis.js"></script>
+  <script src="http://code.jquery.com/jquery.min.js"></script>
+  <link href="vis/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+<!--    -->
+</head>
+<body>
+<p align=center>
+  <font size="+2">
+  This shows your past, present and future, Old Man.
+  </font>
+</p>
+<p align=center>
+  <button onclick="showAllGroups()">Restore Hidden Entries</button>
+  </p>
+<div id="visualization"></div>
+
+
+ <br> 
+  <br> 
+   <br> 
+<p><img src="bitcoin.jpg" alt="Bitcoin" style="width:600px;height:300px;margin-right:15px;">
+How is the Block Reward Determined?
+Satoshi Nakamoto, Bitcoin's creator, set the block reward schedule when he created Bitcoin. It is one of Bitcoin's central rules and cannot be changed without agreement between the entire Bitcoin network.
+
+The block reward started at 50 BTC in block #1 and halves every 210,000 blocks. This means every block up until block #210,000 rewards 50 BTC, while block 210,001 rewards 25. Since blocks are mined on average every 10 minutes, 144 blocks are mined per day on average. At 144 blocks per day, 210,000 blocks take on average four years to mine.
+
+Total circulation will be 21,000,000 coins. It'll be distributed to network nodes when they make blocks, with the amount cut in half every 4 years. first 4 years: 10,500,000 coins next 4 years: 5,250,000 coins next 4 years: 2,625,000 coins next 4 years: 1,312,500 coins etc... Satoshi Nakamoto</p>
+ <br> 
+  <br> 
+   <br> 
+
+<div id="loading">Loading data...</div>
+<div id="log"></div>
+<script type="text/javascript">
+    // .vis-item.openwheel  { background-color: #B0E2FF; }
+    // .vis-item.rally      { background-color: #EAEAEA; }
+  // load data via an ajax request. When the data is in, load the timeline
+  var groups;
+  var items;
+  
+  $.ajax({
+    url: 'data.json',
+	contentType: 'application/json; charset=utf-8',
+    dataType: 'text',
+    success: function (data) {
+      // hide the "loading..." message
+      document.getElementById('loading').style.display = 'none';
+
+      // DOM element where the Timeline will be attached
+      var container = document.getElementById('visualization');
+
+      // Create a DataSet (allows two way data-binding)
+	  console.log(data);
+	  json = JSON.parse(data)
+      items = new vis.DataSet(json["items"]);
+	  groups = new vis.DataSet(json["groups"]);
+
+	  // create visualization
+	  var container = document.getElementById('visualization');
+	  var options = {
+		// option groupOrder can be a property name or a sort function
+		// the sort function must compare two groups and return a value
+		//     > 0 when a > b
+		//     < 0 when a < b
+		//       0 when a == b
+		groupOrder: function (a, b) {
+		  return a.value - b.value;
+		},
+		groupOrderSwap: function (a, b, groups) {
+			var v = a.value;
+			a.value = b.value;
+			b.value = v;
+		},
+		groupTemplate: function(group){
+		  var container = document.createElement('div');
+		  var label = document.createElement('span');
+		  label.innerHTML = group.content + ' ';
+		  container.insertAdjacentElement('afterBegin',label);
+		  var hide = document.createElement('button');
+		  hide.innerHTML = 'hide';
+		  hide.style.fontSize = 'small';
+		  hide.addEventListener('click',function(){
+			groups.update({id: group.id, visible: false});
+		  });
+		  container.insertAdjacentElement('beforeEnd',hide);
+		  return container;
+		},
+		orientation: 'both',
+		editable: {
+			add: false,         // add new items by double tapping
+			updateTime: false,  // drag items horizontally
+			updateGroup: false, // drag items from one group to another
+			remove: false,       // delete an item by tapping the delete button top right
+			overrideItems: false  // allow these options to override item.editable
+		},
+		margin: {
+			item : {
+				horizontal : 0 // -1.0 to show next to each other
+			}
+        },
+		groupEditable: false,
+		start: new Date(1970, 0, 1),
+		end: new Date(2045, 11, 31)
+	  };
+
+	  // Create a Timeline
+	  var timeline = new vis.Timeline(container);
+	  timeline.setOptions(options);
+	  timeline.setGroups(groups);
+	  timeline.setItems(items);
+	  
+	  timeline.on('select', function (properties) {
+		$('#iteminfo').load(encodeURIComponent('Bitcoin Block Reward.txt'));
+		});
+	  timeline.on('click', function (properties) {
+		logEvent('click', properties);
+		});
+    },
+    error: function (err) {
+      console.log('Error', err);
+      if (err.status === 0) {
+        alert('Failed to load data/data.json.\nPlease run this example on a server.');
+      }
+      else {
+        alert('Failed to load data/data.json.');
+      }
+    }
+  });
+  
+    function logEvent(event, properties) {
+      var log = document.getElementById('log');
+      var msg = document.createElement('div');
+      msg.innerHTML = 'event=' + JSON.stringify(event) + ', ' +
+          'properties=' + stringifyObject(properties);
+      log.firstChild ? log.insertBefore(msg, log.firstChild) : log.appendChild(msg);
+    }
+  // function to make all groups visible again
+  function showAllGroups(){
+    groups.forEach(function(group){
+      groups.update({id: group.id, visible: true});
+    })
+  };
+    function stringifyObject (object) {
+      if (!object) return;
+      var replacer = function(key, value) {
+        if (value && value.tagName) {
+          return "DOM Element";
+        } else {
+          return value;
+        }
+      }
+      return JSON.stringify(object, replacer)
+    }
+
+</script>
+</body>
+</html>
